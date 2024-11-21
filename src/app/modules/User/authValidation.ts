@@ -7,7 +7,7 @@ export const registerValidation = z.object({
         email:z.string(),
         password:z.string(),
         isActive:z.enum(['active' , 'blocked']).default('active'),
-        role:z.enum(['admin' , 'moderator' , 'user' , 'superAdmin']),
+        role:z.enum(['admin' , 'moderator' , 'user' , 'superAdmin']).default('user'),
         isDeleted:z.boolean().default(false)
     })  
 })
