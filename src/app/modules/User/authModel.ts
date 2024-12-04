@@ -2,6 +2,7 @@ import { model, Schema } from "mongoose";
 import { Tuser } from "./authInterface";
 import bcrypt from 'bcrypt'
 import httpStatus from 'http-status-codes'
+import App__Error from "../../error/App__Error__";
 
 
 const userSchema = new Schema<Tuser>({
@@ -46,10 +47,8 @@ userSchema.pre('save', async function (next) {
     try {
          this.password = await bcrypt.hash(this.password, Number(12));
         next(); 
-    } catch (err: any) {
-        err.statusCode = httpStatus.INTERNAL_SERVER_ERROR;
-        err.message = 'Error hashing password';
-        next(err); 
+    } catch (err) {
+        throw new App__Error(httpStatus.INTERNAL_SERVER_ERROR,'Error hashing password') 
     }
 });
 
@@ -57,9 +56,7 @@ userSchema.pre('save', async function (next) {
     try {
       const isExistUser = await User.findOne({ email: this.email });
       if (isExistUser) {
-        const error: any = new Error('This email is already in use. Please try another email.');
-        error.statusCode = httpStatus.BAD_REQUEST; 
-        return next(error);
+        throw new App__Error(httpStatus.CONFLICT,'This email is already in use. Please try another email.')
       }
       next(); 
     } catch (error:any) {
